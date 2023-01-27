@@ -1,25 +1,64 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import "./App.css";
 
-function App() {
+const App = () => {
+  const [currentRoute, setCurrentRoute] = useState(null);
+
+  const handleLocationChange = () => {
+    const path = window.location.pathname;
+    switch (path) {
+      case "/":
+        setCurrentRoute(<Home />);
+        break;
+      case "/main":
+        setCurrentRoute(<Main />);
+        break;
+      case "/profile":
+        setCurrentRoute(<Profile />);
+        break;
+      default:
+        setCurrentRoute(<NotFound />);
+        break;
+    }
+  };
+
+  useEffect(() => {
+    handleLocationChange();
+    window.addEventListener("popstate", handleLocationChange);
+    return () => {
+      window.removeEventListener("popstate", handleLocationChange);
+    };
+  }, []);
+
+  const handleLinkClick = (path) => {
+    window.history.pushState({}, null, path);
+    handleLocationChange();
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <div className="app-container">
+      <div className="nav-container">
+        <button className="nav-button" onClick={() => handleLinkClick("/")}>
+          Home
+        </button>
+        <button className="nav-button" onClick={() => handleLinkClick("/main")}>
+          Main
+        </button>
+        <button
+          className="nav-button"
+          onClick={() => handleLinkClick("/profile")}
         >
-          Learn React
-        </a>
-      </header>
+          Profile
+        </button>
+      </div>
+      <div className="route-container">{currentRoute}</div>
     </div>
   );
-}
+};
+
+const Home = () => <h1>Home</h1>;
+const Main = () => <h1>Main</h1>;
+const Profile = () => <h1>Profile</h1>;
+const NotFound = () => <h1>404 Not Found</h1>;
 
 export default App;
